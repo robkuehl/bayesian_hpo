@@ -1,0 +1,157 @@
+# Gaussian Processes - from zero to hero
+
+## Grundlagen der Wahrscheinlichkeitstheorie
+Bevor wir uns mit Gaußschen Prozesse beschäftigen, wiederholen wir zunächst kurz die Grundlagen der Wahrscheinlichkeitstheorie.
+
+### Zufallsvariablen 
+Einfach gesprochen: Eine Zufallsvariable (Random Variable) ist eine ==numerische Größe, die zufällige Werte annimmt==.
+Sie ist eine Funktion über den Outcome eines Zufallsexperiments, wie z.B. dem Ziehen von Murmeln aus einer Urne oder dem zufälligen Auswählen einer Person aus einer Gruppe.
+
+__Beispiel__ Zufallsvariable:<br>
+	Wähle aus einer Mengen von Personen $P$ zufällig eine Person $p\in P$ aus. Das Gewicht der Person wird dann durch die Zufallsvariable $W(p)$ beschrieben.
+	
+__Stetige Zufallsvariablen__<br>
+_TODO_<br>
+__Diskrete Zufallsvariablen__<br>
+_TODO_<br>
+	
+### Wahrscheinlichkeitsfunktion 
+Eine Wahrscheinlichkeitsfunktion $\mathcal{P}(x)$ weist jedem Ereignis der Zufallsvariablen $X$ eine Wahrscheinlichkeit zu: 
+	$$p(x) = \mathcal{P}(X=x)$$
+	
+
+__Diskrete Zufallsvariable mit Wahrscheinlichkeitsfunktion:__
+/Diskrete_Zufallsvariable.jpeg
+
+_Anmerkung:_ Für stetige Zufallsvariablen gilt $P(X=x)=0$!
+
+### Verteilungen / Verteilungsfunktion
+Für eine Zufallsvariable $X$ ist die Kumulative Verteilungsfunktion (CDF) definiert als 
+$$F_X(x) = \mathcal{P}(X\le x)$$
+__CDF diskreter Zufallsvariablen__
+$$F_X(x) = \mathcal{P}(X\le x) = \sum_{k\le x}p_X(k)$$
+__CDF stetiger Zufallsvariablen__
+$$F_X(x) = \mathcal{P}(X\le x) = \int_{-\inf}^x f_X(t)dt$$
+Dabei ist $f_X(x) = \dfrac{\partial F_X(x)}{\partial x}$ die Wahrscheinlichkeitsdichtefunktion (PDF).
+
+### Stochastitsche Unabhängigkeit
+__Unabhängigkeit von zwei Ereignissen:__ <br>
+Für Ereignisse $A, B \subset \Omega$ gilt:
+$$P(A\cap B) = P(A) \cdot P(B)$$
+__Unabhängigkeit von zwei Zufallsvariablen:__ <br>
+Zwei Zufallsvariablen $X, Y$ heißen stochastisch unabhängig, falls gilt: 
+$$p_{X,Y}(x,y) = P(X=x \wedge Y=y) = P(X=x)\cdot P(Y=y) = p_X(x)\cdot p_Y(y)$$
+
+### Bedingte Wahrscheinlichkeit
+Betrachten wir folgendes Zufallsexperiment:<br>
+	Gegeben sind zwei Schalen A und B mit Murmeln. In Schale A liegen 1 blaue und 4 gelbe. In Schale B liegen 3 blaue und 2 gelbe. Wir ziehen nun zufällig aus einer der beiden Schalen eine Murmel.
+1. Frage: Wie hoch ist die Wahrscheinlichkeit eine blaue Murmel zu ziehen?
+2. Frage: Wie hoch ist die Wahrscheinlichkeit eine rote Murmel zu ziehen unter der Bedingung, dass wir aus Schale A ziehen? 
+
+Betrachten wir unser Experiment zunächst grafisch:
+/Bowls.jpg
+
+Es gilt: 
+1. $P(blau) = \dfrac{4}{10}$
+2. Bedingte Wahrscheinlichkeit bedeutet, dass wir unseren Ereignisraum restringieren / einschränken auf solche Ereignisse, welche die Bedingung erfüllen. Daher gilt $P(blau \vert A) = P(\text{blau aus Schale A}) = \dfrac{1}{4}$
+
+/BedingteWK2.jpeg
+
+__Beispiel bedingte Wahrscheinlichkeit: Medizinische Diagnose__ <br>
+Wir nehmen an eine Person wird positiv auf eine Krankheit getestet, die 1 aus 1000 Personen betrifft.
+Der Test hat eine Genauigkeit von 99%. Wie hoch ist die Wahrscheinlichkeit, dass die Person tatsächlich erkrankt ist? <br><br>
+Wir können uns die Wahrscheinlichkeit der einzelnen Ereignisse zunächst in einem Baumdiagramm anschauen: 
+/BedingteWKBaum.jpeg
+
+Wir wollen nun wissen, groß die Wahrscheinlichkeit ist, dass die Person erkrankt ist unter der Bedingung dass der Test positiv ausgefallen ist. Dazu schränken wir unsere Ereignismenge auf die Fälle ein, die diese Bedingung erfüllen:
+/BedingteWKBaum2.jpeg
+Für unsere gesuchte Wahrscheinlichkeit folgt nun
+$$P(cancer \vert test+) = \dfrac{0.001 \cdot 0.99}{0.001 \cdot 0.99 + 0.999 \cdot 0.01} \approx 0.09$$
+Warum weicht dieser Wert so stark von der Testgenauigkeit ab?
+$$\text{Testgenauigkeit} = P(test+ \vert cancer) = 0.99$$
+$$\text{WK tatsächlicher Erkrankung} = P(cancer \vert test+) \approx 0.09$$
+Es ist also wichtig zu beachten, dass diese beiden bedingten Wahrscheinlichkeiten im Allgemeinen nicht gleich sind.
+
+### Bayes Theorem
+Nachdem wir uns mit den Grundlagen der bedingten Wahrscheinlichkeiten beschäftigen haben, kommen wir nun zu einer Aussage, die zentral für den späteren Optimierungsalgorithmus ist, das Theorem von Bayes:
+$$P(H \vert E) = \dfrac{P(H) \cdot P(E \vert H)}{P(E)}$$
+Dabei ist $H$ unsere Hypothese und $E$ unsere Evidenz.
+Wir leiten uns das Theorem nun anhand eines Beispiels her und betrachten dazu folgenden Beschreibung einer Person:
+> Steve ist sehr schüchtern und zurückgezogen, ausnahmslos hilfsbereit, aber mit sehr wenig Interesse an Menschen oder an der realen Welt. Er ist eine sanftmütige und ordentliche Seele, hat ein Bedürfnis nach Ordnung und Struktur und eine Leidenschaft für Details.
+
+Frage: Ist Steve eher ein Bibliothekar oder ein Farmer? <br><br>
+Ohne lange zu überlegen würden die meisten Menschen intuitiv auf Grunde der Beschreibung seiner Persönlichkeit sagen, dass Steve ziemlich sicher ein Bibliothekar ist. Was sie dabei vergessen zu berücksichtigen ist das Mengenverhältnis von Bibliothekaren und Farmern. Nehmen wir als Grundlage das Mengenverhältnis von 1:20 welches auch Kahnemann und Tversky annahmen und betrachten eine repräsentative Stichprobe von 10 Bibliothekaren und 200 Farmern.
+Nehmen wir nun weiterhin an, dass wir 40% unserer Bibliothekare und 10% unserer Farmer der obigen Beschreibung entsprechen.
+Dann gilt, dass 
+$$P(H \vert E) = P(\text{Person ist Bibliothekar gegeben Beschreibung}) \\ = \text{Anteil Bibliothekare unter Personen die Beschreibung erfüllen} = \dfrac{4}{24} \approx 16.7\%$$
+Das heißt, selbst wenn es vier mal so wahrscheinlich ist, dass ein Bibliothekar die Beschreibung erfüllt, reicht das nicht aus um die Tatsache zu überwinden,  dass es viel mehr Farmer gibt.
+> New evidence should not determine belief, but update prior belief.
+
+Wie bereits oben beschreiben, __neue Evidenz restringiert den Raum möglicher Beobachtungen__:
+> 4% Bibliothekare -> Beschreibung -> 16.7% Bibliothekare.<br><br>
+> The posterior is the belief after seeing the evidence.
+<br><br><br><br><br><br>
+__Herleitung Bayes Theorem__ <br>
+1. Prior $$P(H \vert E) = \text{WK der Hypothese gegeben Evidenz}$$
+2. Likelihod $$P(E \vert H)= \text{WK der Evidenz, falls die Hypothese zutrifft}$$ D.h. $P($ die Beschreibung trifft zu, falls die Person Bibliothekar ist $)$
+3. Posterior $$P(H \vert E) = \dfrac{\#\text{Bibliothekare die Evidenz erfüllen}}{\#\text{Personen die Evidenz erfüllen}}$$ $$=\dfrac{\#\text{Personen}\cdot P(H)\cdot P(E \vert H)}{\#\text{Personen}\cdot P(H) \cdot P(E \vert H) + \#\text{Personen}\cdot P(\lnot H) \cdot P(E \vert \lnot H)}$$ $$=\dfrac{P(H) \cdot P(E \vert H)}{P(H) \cdot P(E \vert H) + P(\lnot H) \cdot P(E \vert \lnot H)}$$ $$=\dfrac{P(H) \cdot P(E \vert H)}{P(E)}$$
+
+/Bayes.jpeg
+/Bayes_toremember.jpeg
+
+## Gauss Prozesse (Gaussian Processes)
+Gauss Prozesse sind die Grundlage für die Bayerische Hyperparameter Optimierung, daher ist es wichtig insbesondere diese zu verstehen.
+
+### Herleitung der Gauss Prozesse
+#### Motivation 
+Wir starten unsere Reise zum Verständnis von Gauss Prozessen bei der nicht-linearen Regression. 
+Gegeben sei uns eine Menge von Datenpunkten $(x,y)$ bestehend aus dem Input $x$ und dem Wert $y$. Nun wollen wir für einen neuen Input eine Preditkion / Schätzung für den Wert angeben.
+/datapoints.png
+Bei der nicht-linearen Regression würden wir nun versuchen ein Polynom zu finden, welches die Natur der Daten bestmöglich abbildet.
+Wir erhalten also genau eine Funktion (Best Estimate) die unsere Daten modelliert.
+/regression.png
+Worauf wir nun abzielen ist eine Menge von Funktionen, die alle das Potenzial besitzen unsere Daten abzubilden, die wir aktualisieren können, wenn wir neue Datenpunkte erhalten.
+Dadurch erhalten wir so etwas wie ein Konfidenzintervall an jedem Input $x$, d.h. wie sicher wir uns sind, das unser Best Estimate die Daten hier korrekt abbildet.
+/regression_with_error.png
+Um das zu erreichen wenden wir uns im folgenden der Gauss Verteilung zu.
+
+#### Die Welt der Multivariaten Gauss Verteilungen 
+Die Eigenschaften von Gauss Verteilungen haben wir uns bereits weiter oben angesehen. Nun betrachten wir eine Verteilung, bei der die Zufallsvariable eine Linearkombination mehrerer Zufallsvariablen ist.
+Die formale Definition lautet:
+$$X=(X_1,...,X_k)^T$$ hat eine multivariate Gaußsche Verteilung falls für jeden konstanten Vektor $a\in \mathcal{R}^k$ gilt:
+$$Y=a_1X_1+a_2X_2+...+a_kX_k$$ ist normalverteilt.
+In Worten: Eine Zufallsvariable ist k-variat Gauss verteilt, falls jede Linearkombination ihrer k Komponenten ebenfalls Gauss verteilt ist.
+<br><br>
+__Anmerkung:__ Die Summe zweier Zufallsvariablen ist nicht das gleiche wie die Summe zweier Verteilungen.
+/randomvar_distr.png
+Summe von Verteilungen: Wahrscheinlichkeit für das Event $(X_1=x_1, X_2=x_2)$.<br>
+Summe von Zufallsvariablen: $\mathcal{P}(x_1+x_2=x)$.
+
+##### Kovarianzmatrix und bedingte Verteilung
+Wir betrachten nun zwei wichtige Eigenschaften der Gauss Verteilung beispielhaft im 2 dimensionalen Fall.
+Die Eigenschaften der Verteilung sind vollständig bestimmt durch den Mean $\mu$ und die Kovarianzmatrix $\Sigma$. <br>
+Die __Kovarianzmatrix__ sagt uns: <br>
+1. welche Varianz die einzelnen Zufallsvariablen haben (Diagonaleinträge)
+2. Welche Kovarianz zwischen den Zufallsvariablen besteht (Nichtdiagonaleinträge)
+/2dGaussian.png
+In diesem Bild sehen wir eine Beispiel für eine 2D Gauss Verteilung. Punkte auf den Ovalen haben alle die gleiche Wahrscheinlichkeit. Die Kovarianz sagt uns, in welchem Maße die eine Variable uns Informationen über die andere liefert. Nimmt sie den Wert 1 an, sind die beiden Variablen linear abhängig.
+Reduzieren wir die Kovarianz, passiert folgendes:
+<br>
+<img src="covariance_reduction1.png" height="300" width="300">
+<img src="covariance_reduction2.png" height="300" width="300">
+<img src="covariance_reduction3.png" height="300" width="300">
+<br><br>
+Für __bedingte Verteilungen__ wissen wir bereits, dass wir unseren Ereignisraum auf solche Ereignisse beschränken, welche die gestellte Bedingung erfüllen. 
+Das gleich passiert im Fall der multivariaten Verteilung.
+Im 2-dimensionalen Fall können wir uns die Verteilung der Zufallsvariable $Y_2$ angucken unter der Bedingung das $y_1=1$ ist.
+Grafisch fixieren wir $y_1$ und Berechnen die Wahrscheinlichkeitsdichtefunktion der Zufallsvariable $Y_2$ entlang der vertikalen (roten) Linie.
+<img src="2D_condition.png" height="300" width="300"> <br>
+Die bedingte Verteilung ist wieder eine Normalverteilung:
+<img src="2D_condition_distr.png" height="300" width="300"> <br><br>
+Welche Auswirkung hat die Kovarianz auf die bedingte Verteilung?<br>
+Eine hohe Kovarianz sagt uns, dass der Outcome der einen Zufallsvariable uns viele Informationen über den möglichen Outcome der anderen liefert. Das heißt der bedingte Ereignisraum ist kleiner, die Varianz der möglichen Ereignisse also geringer. Resultierend ist die Gaussglocke spitzer.<br>
+Analog ist sie für geringere Kovarainz breiter. Sind die Variablen vollständig unabhängig, ist die bedingte Verteilung einfach die Verteilung der Variablen selbst. <br>
+__TODO: Grafik einbauen__
+##### Höherdimensionale Gaussverteilungen
+Bevor wir uns nun Gaussverteilungen höherer Dimension anschauen, führen wir nun eine Notation ein
+

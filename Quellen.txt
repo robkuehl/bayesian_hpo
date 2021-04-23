@@ -1,0 +1,55 @@
+Stochastische Grundlagen (grob)
+	- Zufallsvariablen 
+		- Definition https://www.youtube.com/watch?v=vfqPpai_9jI
+		- Unabhängigkeit https://www.youtube.com/watch?v=F6H50Hbulbk
+	- Verteilungen
+		- Wahrscheinlichkeitsdichtefunktion https://www.youtube.com/watch?v=8QFpZ3FndBc
+		- Verteilungsfunktion https://www.youtube.com/watch?v=4QeL1ma_XJ0
+		- Gauss Verteilung https://www.youtube.com/watch?v=6UMv4vb4y7c
+	
+	
+Bayes Theorem (sehr wichtig)
+	- Bedingte Wahrscheinlichekit https://www.youtube.com/watch?v=JGeTcRfKgBo
+	- Bayes Theorem https://www.youtube.com/watch?v=HZGCoVF3YvM
+	
+	
+Gaussian Processes 
+	- Nicht mathematisch (intuitiv) https://towardsdatascience.com/an-intuitive-guide-to-gaussian-processes-ec2f0b45c71d
+	- Herleitung GP inkl. Grundlagen Gaussverteilung https://www.youtube.com/watch?v=4vGiHC35j9s
+	- Herleitung (ausführlich) https://www.youtube.com/watch?v=92-98SYOdlY
+		- Transskribiert https://thegradient.pub/gaussian-process-not-quite-for-dummies/
+	- Visual Exploration of Gaussian Processes https://distill.pub/2019/visual-exploration-gaussian-processes/
+	- How to sample from a GP https://math.stackexchange.com/questions/1218718/how-do-we-sample-from-a-gaussian-process
+		- Warrum benutzen wir die Cholesky Zerlegung https://math.stackexchange.com/questions/2079137/generating-multivariate-normal-samples-why-cholesky
+	- Gaussian Processes mathematisch & Implementierung https://krasserm.github.io/2018/03/19/gaussian-processes/
+	
+	- Weitere Quellen:
+		- Understanding Gaussian Processes (kurz, Übersicht) https://peterroelants.github.io/posts/gaussian-process-tutorial/
+		- Wie samplen wie aus einem Gauss Prozess https://math.stackexchange.com/questions/1218718/how-do-we-sample-from-a-gaussian-process
+	
+
+Bayesian Optimization - Hyperparameter Optimization with Gaussian Processes 
+	- Exploring Bayesian Optimization (top Visualisierung) https://distill.pub/2020/bayesian-optimization/
+	- A Tutorial on Bayesian Optimization (Paper) https://arxiv.org/pdf/1807.02811.pdf
+	- A Tutorial on Bayesian Optimization of Expensive Cost Function (Paper) https://arxiv.org/pdf/1012.2599.pdf
+	- Bayesian optimization - Martin Krasser's Blog (Theorie + Implementierung from Scratch) https://krasserm.github.io/2018/03/21/bayesian-optimization/
+	
+	- Weieter Quellen
+		- Talk on Bayesian Optimization https://www.youtube.com/watch?v=C5nqEHpdyoE
+
+
+TPE (Tree Structure of Parzen Estimator)
+	- TPE: How Hyperopt Works (Talk des Entwicklers) https://www.youtube.com/watch?v=tdwgR1AqQ8Y
+	- Conceptual Explenation of Bayesian Hyperparameter Optimization https://towardsdatascience.com/a-conceptual-explanation-of-bayesian-model-based-hyperparameter-optimization-for-machine-learning-b8172278050f?gi=2dcf6e46823f
+	- TPE & BO Blogbeitrag https://neupy.com/2016/12/17/hyperparameter_optimization_for_neural_networks.html#tree-structured-parzen-estimators-tpe
+	- What does "Tree" in TPE actually mean? https://stats.stackexchange.com/questions/463075/what-is-the-tree-structure-in-tree-parzen-estimators
+	- What is the Parzen Estimator? https://stats.stackexchange.com/questions/244012/can-you-explain-parzen-window-kernel-density-estimation-in-laymans-terms
+
+	
+Vergleich der Algorihtmen
+	- Algorithms for Hyper-Parameter Optimizatio (Paper) https://papers.nips.cc/paper/2011/file/86e8f7ab32cfd12577bc2619bc635690-Paper.pdf
+	- Hyperparameter Optimization Algorithms: A short review https://medium.com/criteo-engineering/hyper-parameter-optimization-algorithms-2fe447525903
+	- BOHB Cheatsheet (HpBandSter) https://ml.informatik.uni-freiburg.de/papers/18-ICML-BOHB-poster.pdf
+
+
+
