@@ -58,7 +58,7 @@ def kfold_validation(task, model, X, y, metric):
         y_train (np.array): Ground Truth
         metric (str): Supported metric (mse, mae, mape)
     """
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=2, shuffle=True, random_state=42)
     kf.get_n_splits(X)
     
     scores = []
@@ -71,7 +71,7 @@ def kfold_validation(task, model, X, y, metric):
         model.fit(X_train, y_train.values.ravel())
         
         # evaluation 
-        if task=='regression':
+        if task=='regr':
             error = evaluate_reg_model(model, metric, X_test, y_test, rescaled=False)
             scores.append(error)
             
