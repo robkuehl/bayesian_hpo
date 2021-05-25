@@ -46,7 +46,8 @@ def _random_state(name, random_state):
         return random_state
     
 
-
+# TODO: Anpassen der Default Searchspaces -> 6000 Estimator nicht sinnvoll!
+# TODO: Nachschlagen der Verteilungen 
 ###################################################
 ##==== XGBoost hyperparameters search space ====##
 ###################################################

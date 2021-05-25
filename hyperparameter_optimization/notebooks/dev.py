@@ -58,7 +58,7 @@ X, y = get_processed_data()
 
 #%% 
 hyperparams={'verbose':2}
-param_space = get_searchspace(model='random_forest', name='myRegr', task='regr',**hyperparams)
+param_space = get_searchspace(model='random_forest', name='myRegr', task='regr', **hyperparams)
 
 #%%
 
@@ -68,6 +68,8 @@ result = hpo_tpe(task='regr',
                 param_space=param_space,
                 X=X,
                 y=y,
-                max_evals=40)
+                max_evals=10)
+
+print(result)
 
 # %%

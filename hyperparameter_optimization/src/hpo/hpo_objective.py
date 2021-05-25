@@ -11,7 +11,8 @@ from xgboost import XGBClassifier, XGBRegressor
 from lightgbm import LGBMClassifier, LGBMRegressor
 
 import mlflow
-
+from datetime import datetime
+import json
 
 
 def get_model(model_type:str, task, hyperparams):
@@ -58,6 +59,7 @@ def skopt_objective(task:str, model_type:str, eval_metric:str, X, y, param_names
     
     
 def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, hyperparams:dict):
+    '''
     fold_score = 0
     with mlflow.start_run():
         model = get_model(model_type, task, hyperparams)
@@ -65,6 +67,13 @@ def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, hyperparams:
         mlflow.log_param('model_type', model_type)
         mlflow.log_metric('fold_score', fold_score)
         mlflow.log_params(hyperparams)
+    '''
+    print(hyperparams)
+        
+    model = get_model(model_type, task, hyperparams)
+    fold_score = kfold_validation(task, model, X, y, eval_metric)
+    
+    # TODO: Loggen der Hyperparameter pro run mit Score
     
     if task == 'regr':
         # fold_score = mean of errors -> Minimize

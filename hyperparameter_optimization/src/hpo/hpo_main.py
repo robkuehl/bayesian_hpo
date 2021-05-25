@@ -43,7 +43,7 @@ def hpo_tpe(task, model_type, eval_metric, param_space, X, y, max_evals):
         max_evals=max_evals,
         algo=tpe.suggest,
     )
-    
+    #TODO: Results returns indices for choice objetcs -> Lookup true values in param_space 
     return result
     
 

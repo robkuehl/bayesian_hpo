@@ -58,6 +58,7 @@ def kfold_validation(task, model, X, y, metric):
         y_train (np.array): Ground Truth
         metric (str): Supported metric (mse, mae, mape)
     """
+    # TODO: Folds auf höherer Ebene übergeben
     kf = KFold(n_splits=2, shuffle=True, random_state=42)
     kf.get_n_splits(X)
     
