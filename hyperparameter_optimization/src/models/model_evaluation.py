@@ -9,19 +9,20 @@ import numpy as np
 
 
 def evaluate_reg_model(model, metric,  X_test, y_test, rescaled):
-    """Function to evaluate model performance. Metric can be chosen.
+    """Function to evaluate model performance of a regressor. Metric can be chosen.
 
     Args:
-        model: [description]
-        metric (str): Metric which should be used for evaluation. Choose between mse, 
-        X_test (np.array): [description]
-        y_test (np.array): [description]
+        model: Regression model object with predict method (see sklearn for examples)
+        metric (str): Metric which should be used for evaluation. Choose between mse, mae, mape
+        X_test (np.array): numpy array of input data for testing
+        y_test (np.array): numpy value of target variable for prediction
+        rescaled (bool): If 'True', data will be rescaled before evaluation
 
     Raises:
         ValueError: Raised of chosen metric is not a possible choice.
 
     Returns:
-        error [float]: error return by the metric
+        error [float]: error depedning on the chosen metric
     """
     if rescaled:
         # load scaler
@@ -48,18 +49,17 @@ def evaluate_reg_model(model, metric,  X_test, y_test, rescaled):
     return error
 
 
-def kfold_validation(task, model, X, y, metric):
+def kfold_validation(task, model, X, y, metric, n_splits):
     """Function to run k-fold cross validation on a model. Model for evaluation depends on the task.
 
     Args:
-        task (str): 'regression' or 'classification'
-        model: model with fit function which only needs X and y
-        X_train (np.array): Training Input
-        y_train (np.array): Ground Truth
-        metric (str): Supported metric (mse, mae, mape)
+        task (str): 'regr' or 'binary_clf'
+        model: model object with fit function (see sklearn) which only needs X and y as input
+        X_train (np.array): numpy array of input data for training
+        y_train (np.array): numpy value of target variable for prediction
+        metric (str): Metric which should be used for evaluation. Choose between mse, mae, mape
     """
-    # TODO: Folds auf höherer Ebene übergeben
-    kf = KFold(n_splits=2, shuffle=True, random_state=42)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     kf.get_n_splits(X)
     
     scores = []

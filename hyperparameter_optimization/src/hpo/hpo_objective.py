@@ -13,6 +13,8 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 import mlflow
 from datetime import datetime
 import json
+from hyperopt import space_eval
+import pandas as pd
 
 
 def get_model(model_type:str, task, hyperparams):
@@ -58,22 +60,21 @@ def skopt_objective(task:str, model_type:str, eval_metric:str, X, y, param_names
         return fold_score
     
     
-def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, hyperparams:dict):
-    '''
+def hyperopt_objective(param_space, task:str, model_type, eval_metric:str, X, y, n_splits, hyperparams:dict):
+    
     fold_score = 0
     with mlflow.start_run():
         model = get_model(model_type, task, hyperparams)
-        fold_score = kfold_validation(task, model, X, y, eval_metric)
-        mlflow.log_param('model_type', model_type)
-        mlflow.log_metric('fold_score', fold_score)
-        mlflow.log_params(hyperparams)
-    '''
-    print(hyperparams)
+        fold_score = kfold_validation(task, model, X, y, eval_metric, n_splits)
+        if type(X)==pd.DataFrame:
+            mlflow.log_param("features", list(X.columns))
+        mlflow.log_param('model', str(model))
+        mlflow.log_metric(eval_metric, fold_score)
+        params = space_eval(param_space, hyperparams)
+        mlflow.log_params(params)
         
-    model = get_model(model_type, task, hyperparams)
-    fold_score = kfold_validation(task, model, X, y, eval_metric)
-    
-    # TODO: Loggen der Hyperparameter pro run mit Score
+    # model = get_model(model_type, task, hyperparams)
+    # fold_score = kfold_validation(task, model, X, y, eval_metric)
     
     if task == 'regr':
         # fold_score = mean of errors -> Minimize
@@ -82,7 +83,7 @@ def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, hyperparams:
     
     
     
-def get_optimization_func(search_algo, task, model_type, eval_metric, X, y, param_names=None):
+def get_optimization_func(search_algo, param_space, task, model_type, eval_metric, X, y, n_splits, param_names=None):
     if search_algo == 'gaussian_processes':
         if param_names==None:
             raise ValueError('Need to provide param_names!')
@@ -90,7 +91,7 @@ def get_optimization_func(search_algo, task, model_type, eval_metric, X, y, para
         return opt_func
     
     if search_algo == 'tpe':
-        opt_func = partial(hyperopt_objective, task, model_type, eval_metric, X, y)
+        opt_func = partial(hyperopt_objective, param_space, task, model_type, eval_metric, X, y, n_splits)
         return opt_func
     
     

@@ -3,7 +3,8 @@ sys.path.append('..')
 
 from src.hpo.hpo_objective import get_optimization_func
 from skopt import gp_minimize
-from hyperopt import hp, fmin, Trials, tpe
+from hyperopt import hp, fmin, Trials, tpe, space_eval
+import mlflow
 
 
 def hpo_gaussian_process(task, model, eval_metric, param_space, X, y, n_calls, n_random_starts, verbose):
@@ -26,13 +27,19 @@ def hpo_gaussian_process(task, model, eval_metric, param_space, X, y, n_calls, n
     return dict(zip(param_names, result.x))
 
 
-def hpo_tpe(task, model_type, eval_metric, param_space, X, y, max_evals):
+def hpo_tpe(task, model_type, eval_metric, param_space, X, y, max_evals, experiment_name):
+    
+    mlflow.set_experiment(experiment_name)
+    
     opt_func = get_optimization_func(search_algo='tpe', 
+                                     param_space=param_space,
                                      task=task, 
                                      model_type=model_type, 
                                      eval_metric=eval_metric, 
                                      X=X, 
-                                     y=y)
+                                     y=y,
+                                     n_splits=3)
+    
     
     trials = Trials()
     
@@ -43,7 +50,9 @@ def hpo_tpe(task, model_type, eval_metric, param_space, X, y, max_evals):
         max_evals=max_evals,
         algo=tpe.suggest,
     )
-    #TODO: Results returns indices for choice objetcs -> Lookup true values in param_space 
+    # hp.choice return index of hyperparameter choice -> turn indices into real parameter outcomes
+    result = space_eval(space=param_space, hp_assignment=result)
+    
     return result
     
 
