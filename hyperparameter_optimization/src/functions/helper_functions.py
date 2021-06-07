@@ -2,9 +2,13 @@ from pathlib import Path
 import os
 from os.path import join as pathjoin
 import pandas as pd
+from sklearn.model_selection import train_test_split
+import pickle
 
 raw_data_folderpath = pathjoin(Path(__file__).parent.absolute(), Path('../../data/raw'))
 
+
+#==================================Preprocessing=========================================================
 def export_features(df, overwrite=False):
     """Function to export all column indexes from a dataframe to csv
     """
@@ -18,9 +22,30 @@ def load_var_types():
         var_types = pd.read_csv(filepath, delimiter=';')
         return var_types
     else:
-        raise FileNotFoundError("Recommended file does not exist. Please check of var_types.csv in raw folder!")
+        raise FileNotFoundError("Nessecary file does not exist. Please check of var_types.csv in raw folder!")
     
 
+def store_obj(obj, path):
+    print('Storing {}'.format(obj))
+    with open(path, 'wb') as pickle_file:
+        pickle.dump(obj, pickle_file)
+
+        
+def load_obj(path):
+    with open(path, 'rb') as pickle_file:
+        obj = pickle.load(pickle_file)
+    return obj
+    
+    
+#==================================Training=========================================================
+def get_training_data(training_data_df):
+    X_df = training_data_df.drop(columns=[' shares'])
+    y_df = training_data_df[' shares']
+    X_train, X_test, y_train, y_test = train_test_split(X_df, y_df, test_size=0.33, random_state=42)
+    return X_train, X_test, y_train, y_test
+    
+    
+#==================================EDA=========================================================
 def dfinfo(df, feature_dtype_list=[], jupyter=False, save=False, returndf=False, filename="None"):
     """ Prints tabular infos to the Dataframe columns
         Parameters:
@@ -68,3 +93,9 @@ def dfinfo(df, feature_dtype_list=[], jupyter=False, save=False, returndf=False,
             if "%" in col:
                 tableframe[col]=tableframe[col].str.replace("%","").astype(float)
         return tableframe
+    
+    
+    #=====================================EXPORT=========================================================
+    def export_experiment_data():
+        # TODO: Export Funktion
+        pass
