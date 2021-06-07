@@ -27,18 +27,17 @@ def hpo_gaussian_process(task, model, eval_metric, param_space, X, y, n_calls, n
     return dict(zip(param_names, result.x))
 
 
-def hpo_tpe(task, model_type, eval_metric, param_space, X, y, max_evals, experiment_name):
+def hpo_tpe(task, model_type, eval_metric, num_fold_splits, param_space, X, y, max_evals, experiment_name):
     
     mlflow.set_experiment(experiment_name)
     
-    opt_func = get_optimization_func(search_algo='tpe', 
-                                     param_space=param_space,
+    opt_func = get_optimization_func(search_algo='tpe',
                                      task=task, 
                                      model_type=model_type, 
                                      eval_metric=eval_metric, 
                                      X=X, 
                                      y=y,
-                                     n_splits=3)
+                                     n_splits=num_fold_splits)
     
     
     trials = Trials()

@@ -64,11 +64,13 @@ param_space = get_searchspace(model='random_forest', name='myRegr', task='regr',
 
 result = hpo_tpe(task='regr', 
                 model_type='random_forest',
-                eval_metric='mse', 
+                eval_metric='mse',
+                num_fold_splits=3,
                 param_space=param_space,
                 X=X,
                 y=y,
-                max_evals=10)
+                max_evals=50,
+                experiment_name='random_forest_hpo')
 
 print(result)
 

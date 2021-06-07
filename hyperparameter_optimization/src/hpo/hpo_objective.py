@@ -60,7 +60,7 @@ def skopt_objective(task:str, model_type:str, eval_metric:str, X, y, param_names
         return fold_score
     
     
-def hyperopt_objective(param_space, task:str, model_type, eval_metric:str, X, y, n_splits, hyperparams:dict):
+def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, n_splits, hyperparams:dict):
     
     fold_score = 0
     with mlflow.start_run():
@@ -70,8 +70,7 @@ def hyperopt_objective(param_space, task:str, model_type, eval_metric:str, X, y,
             mlflow.log_param("features", list(X.columns))
         mlflow.log_param('model', str(model))
         mlflow.log_metric(eval_metric, fold_score)
-        params = space_eval(param_space, hyperparams)
-        mlflow.log_params(params)
+        mlflow.log_params(hyperparams)
         
     # model = get_model(model_type, task, hyperparams)
     # fold_score = kfold_validation(task, model, X, y, eval_metric)
@@ -83,7 +82,7 @@ def hyperopt_objective(param_space, task:str, model_type, eval_metric:str, X, y,
     
     
     
-def get_optimization_func(search_algo, param_space, task, model_type, eval_metric, X, y, n_splits, param_names=None):
+def get_optimization_func(search_algo, task, model_type, eval_metric, X, y, n_splits, param_names=None):
     if search_algo == 'gaussian_processes':
         if param_names==None:
             raise ValueError('Need to provide param_names!')
@@ -91,7 +90,7 @@ def get_optimization_func(search_algo, param_space, task, model_type, eval_metri
         return opt_func
     
     if search_algo == 'tpe':
-        opt_func = partial(hyperopt_objective, param_space, task, model_type, eval_metric, X, y, n_splits)
+        opt_func = partial(hyperopt_objective, task, model_type, eval_metric, X, y, n_splits)
         return opt_func
     
     
