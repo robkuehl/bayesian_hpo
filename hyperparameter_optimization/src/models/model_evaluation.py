@@ -62,7 +62,7 @@ def kfold_validation(task, model, X, y, metric, n_splits):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     kf.get_n_splits(X)
     
-    scores = []
+    scores = {}
     iter=0
     for train_index, test_index in kf.split(X):
         iter+=1
@@ -74,8 +74,9 @@ def kfold_validation(task, model, X, y, metric, n_splits):
         # evaluation 
         if task=='regr':
             error = evaluate_reg_model(model, metric, X_test, y_test, rescaled=False)
-            scores.append(error)
+            key = '{}_{}_{}'.format(metric, 'fold', iter)
+            scores[key]=error
             
-    return np.asarray(scores).mean()
+    return scores, np.asarray(scores.values).mean()
         
         

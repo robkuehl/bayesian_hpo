@@ -93,3 +93,9 @@ def dfinfo(df, feature_dtype_list=[], jupyter=False, save=False, returndf=False,
             if "%" in col:
                 tableframe[col]=tableframe[col].str.replace("%","").astype(float)
         return tableframe
+    
+    
+    #=====================================EXPORT=========================================================
+    def export_experiment_data():
+        # TODO: Export Funktion
+        pass

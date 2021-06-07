@@ -21,7 +21,7 @@ def get_searchspace(model:str, name:str, task:str, **hyperparams) -> dict:
             raise ValueError('You need to define the task correct! Either binary_clf or regr.')
         
     def _name_func(msg):
-        return '%s.%s_%s' % (name, model, msg)
+        return '%s_%s_%s' % (name, model, msg)
     
     if model == 'xgboost':
         return _get_xgboost_hp_space(_name_func, task, **hyperparams)
@@ -29,11 +29,11 @@ def get_searchspace(model:str, name:str, task:str, **hyperparams) -> dict:
     if model == 'random_forest':
         return _get_random_forest_hp_space(_name_func, task, **hyperparams)
 
-    if model == 'light_gbm':
+    if model == 'lightgbm':
         return _get_lightgbm_hp_space(_name_func, task, **hyperparams)
     
     else:
-        print('You did not provide a valid model. Either xgboost, random_forest or light_gbm.')
+        print('You did not provide a valid model: {}. Either xgboost, random_forest or light_gbm.'.format(model))
 
 def get_space_sample(space):
     return sample(space)
@@ -46,13 +46,16 @@ def _random_state(name, random_state):
         return random_state
     
 
-# TODO: Anpassen der Default Searchspaces -> 6000 Estimator nicht sinnvoll!
-# TODO: Nachschlagen der Verteilungen 
+
 ###################################################
 ##==== XGBoost hyperparameters search space ====##
 ###################################################
 
 def _xgboost_max_depth(name):
+    return hp.pchoice(name, [
+        (0.5, None), 
+        (0.5, scope.int(hp.uniform(name+'.uni', 1, 11)))
+    ])
     return scope.int(hp.uniform(name, 1, 11))
 
 def _xgboost_learning_rate(name):
@@ -152,7 +155,7 @@ def _get_xgboost_hp_space(_name_func, task, **hyperparams):
 ####################################################################
 
 def _trees_n_estimators(name):
-    return scope.int(hp.qlognormal(name, 1, 0.5, 1))
+    return scope.int(hp.lognormal(name,  mu=0, sigma=0.5)*100)
     #return scope.int(hp.qloguniform(name, np.log(9.5), np.log(3000.5), 1))
 
 def _trees_clf_criterion(name):
@@ -251,7 +254,11 @@ def _get_random_forest_hp_space(_name_func, task, **hyperparams):
 ###################################################
 
 def _lightgbm_max_depth(name):
-    return scope.int(hp.uniform(name, 1, 11))
+    # return scope.int(hp.uniform(name, 1, 11))
+    return hp.pchoice(name, [
+        (0.5, None),
+        (0.5, scope.int(hp.uniform(name+'.uni', 1, 11)))
+    ])
 
 def _lightgbm_num_leaves(name):
     return scope.int(hp.uniform(name, 2, 121))
@@ -260,7 +267,8 @@ def _lightgbm_learning_rate(name):
     return hp.loguniform(name, np.log(0.0001), np.log(0.5)) - 0.0001
 
 def _lightgbm_n_estimators(name):
-    return scope.int(hp.quniform(name, 100, 6000, 200))
+    return scope.int(hp.lognormal(name,  mu=0, sigma=0.5)*100)
+    # return scope.int(hp.quniform(name, 100, 6000, 200))
 
 def _lightgbm_gamma(name):
     return hp.loguniform(name, np.log(0.0001), np.log(5)) - 0.0001
@@ -285,6 +293,9 @@ def _lightgbm_reg_lambda(name):
 
 def _lightgbm_boosting_type(name):
     return hp.choice(name, ['gbdt', 'dart', 'goss'])
+
+def _lightgbm_min_split_gane(name):
+    pass
 
 def _lightgbm_hp_space(
     name_func,

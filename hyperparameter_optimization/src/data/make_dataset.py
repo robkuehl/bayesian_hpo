@@ -16,13 +16,13 @@ from os.path import join as pathjoin
 #@click.command()
 #@click.argument('input_filepath', type=click.Path(exists=True))
 #@click.argument('output_filepath', type=click.Path())
-def main_make_dataset(input_filepath, output_filepath):
+def main_make_dataset(input_filepath, output_filepath, overwrite):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     if os.path.isfile(output_filepath):
-        overwrite = input("Outputfile already exist. If you want to overwrite please type \"yes\"")
-        if overwrite!='yes':
+        #overwrite = input("Outputfile already exist. If you want to overwrite please type \"yes\"")
+        if overwrite==False:
             return
         
     logger = logging.getLogger(__name__)

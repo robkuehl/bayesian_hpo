@@ -15,6 +15,8 @@ from datetime import datetime
 import json
 from hyperopt import space_eval
 import pandas as pd
+import time
+import numpy as np
 
 
 def get_model(model_type:str, task, hyperparams):
@@ -35,6 +37,7 @@ def get_model(model_type:str, task, hyperparams):
 
 
 def skopt_objective(task:str, model_type:str, eval_metric:str, X, y, param_names, params):
+    #TODO: Funktion anpassen. Siehe hyprtopt_objective
     """Objective function for skopt hyperparameter optimization
 
     Args:
@@ -60,16 +63,25 @@ def skopt_objective(task:str, model_type:str, eval_metric:str, X, y, param_names
         return fold_score
     
     
-def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, n_splits, hyperparams:dict):
+def hyperopt_objective(experiment_id, task:str, model_type, eval_metric:str, X, y, n_splits, hyperparams:dict):
     
     fold_score = 0
-    with mlflow.start_run():
+    with mlflow.start_run(experiment_id=experiment_id):
         model = get_model(model_type, task, hyperparams)
-        fold_score = kfold_validation(task, model, X, y, eval_metric, n_splits)
+        walltime = time.time()
+        # TODO: Entkommentieren
+        # scores, fold_score = kfold_validation(task, model, X, y, eval_metric, n_splits)
+        scores = np.random.uniform(0,1,3)
+        fold_score = min(scores)
+        scores = dict(zip(['fold_1','fold_2','fold_3'], scores))
+        time.sleep(np.random.uniform(0,1))
+        walltime = time.time()-walltime
         if type(X)==pd.DataFrame:
             mlflow.log_param("features", list(X.columns))
         mlflow.log_param('model', str(model))
+        mlflow.log_metrics(scores)
         mlflow.log_metric(eval_metric, fold_score)
+        mlflow.log_metric('walltime', walltime)
         mlflow.log_params(hyperparams)
         
     # model = get_model(model_type, task, hyperparams)
@@ -82,16 +94,17 @@ def hyperopt_objective(task:str, model_type, eval_metric:str, X, y, n_splits, hy
     
     
     
-def get_optimization_func(search_algo, task, model_type, eval_metric, X, y, n_splits, param_names=None):
+def get_optimization_func(search_algo, experiment_id, task, model_type, eval_metric, X, y, n_splits, param_names=None):
     if search_algo == 'gaussian_processes':
         if param_names==None:
             raise ValueError('Need to provide param_names!')
         opt_func = partial(skopt_objective, task, model_type, eval_metric, X, y, param_names)
         return opt_func
     
-    if search_algo == 'tpe':
-        opt_func = partial(hyperopt_objective, task, model_type, eval_metric, X, y, n_splits)
+    if search_algo in ['tpe', 'random']:
+        opt_func = partial(hyperopt_objective, experiment_id, task, model_type, eval_metric, X, y, n_splits)
         return opt_func
+    
     
     
     
