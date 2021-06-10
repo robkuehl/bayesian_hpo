@@ -76,8 +76,8 @@ def hyperopt_objective(experiment_id, task:str, model_type, eval_metric:str, X, 
         scores = dict(zip(['fold_1','fold_2','fold_3'], scores))
         time.sleep(np.random.uniform(0,1))
         walltime = time.time()-walltime
-        if type(X)==pd.DataFrame:
-            mlflow.log_param("features", list(X.columns))
+        # if type(X)==pd.DataFrame:
+        #     mlflow.log_param("features", list(X.columns))
         mlflow.log_param('model', str(model))
         mlflow.log_metrics(scores)
         mlflow.log_metric(eval_metric, fold_score)

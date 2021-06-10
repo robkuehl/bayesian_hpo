@@ -10,6 +10,7 @@ from pathlib import Path
 from os.path import join as pathjoin
 mlruns_folderpath = pathjoin(Path(__file__).parent.absolute(), Path('../../data/mlflow'))
 from mlflow.tracking import MlflowClient
+from datetime import datetime 
 
 
 
@@ -73,15 +74,26 @@ def hpo_hyperopt(experiment_id, algo, task, model_type, eval_metric, num_fold_sp
     
     
 def run_hpo_search(experiments, foldername):
-    mlflow.set_tracking_uri(uri='file:/'+str(pathjoin(mlruns_folderpath, foldername, 'mlruns'))) 
-    print('Storing mlflow logs in {}'.format(mlflow.tracking.get_tracking_uri()))
+    remote_tracking = input('Track experiment on remote server? (y/n)')
+    if remote_tracking == 'y':
+        print('Experiment will be tracked on DAGsHub. If you don\'t have an account set it up on '+ f'https://dagshub.com/')
+        os.environ['MLFLOW_TRACKING_USERNAME'] = input('Enter your DAGsHub username: ')
+        os.environ['MLFLOW_TRACKING_PASSWORD'] = getpass('Enter your DAGsHub access token: ')
+        os.environ['MLFLOW_TRACKING_PROJECTNAME'] = input('Enter your DAGsHub project name: ')
+
+        mlflow.set_tracking_uri(f'https://dagshub.com/' + os.environ['MLFLOW_TRACKING_USERNAME'] 
+                            + '/' + os.environ['MLFLOW_TRACKING_PROJECTNAME'] + '.mlflow')
+        print('Sucessfully set remote tracking uri:{}'.format(mlflow.get_tracking_uri()))
+    else:
+        mlflow.set_tracking_uri(uri='file:/'+str(pathjoin(mlruns_folderpath, foldername, 'mlruns'))) 
+        print('Storing mlflow logs in {}'.format(mlflow.tracking.get_tracking_uri()))
     
     if type(experiments[0])!=dict:
         raise ValueError('Experiments need to be dictionaries!')
     # Create an experiment with a name that is unique and case sensitive.
     client = MlflowClient()
     for experiment in experiments:
-        experiment_name = experiment.pop('experiment_name')
+        experiment_name = experiment.pop('experiment_name')+'_'+datetime.now().strftime("%Y%m%d-%H%M")
         experiment_id = client.create_experiment(experiment_name)
         print(experiment_id)
         client.set_experiment_tag(experiment_id, 'desc', '{}_{}'.format(experiment['model_type'], experiment['algo']))
