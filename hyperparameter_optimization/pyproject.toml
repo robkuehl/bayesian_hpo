@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "hpo"
+version = "0.1.0"
+description = "package to run hpo experiments with hyperopt and skopt in a simple pipeline"
+authors = ["robkuehl <robin.kuehling@cologne-intelligence.de>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.20.3"
+pandas = "^1.2.4"
+xgboost = "^1.4.2"
+lightgbm = "^3.2.1"
+hyperopt = "^0.2.5"
+mlflow = "^1.17.0"
+scikit-learn = "^0.24.2"
+scikit-optimize = "^0.8.1"
+boto3 = "^1.17.90"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

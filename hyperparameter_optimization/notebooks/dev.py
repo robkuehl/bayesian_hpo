@@ -63,7 +63,7 @@ X, y = get_processed_data()
 # Create Searchspaces
 rf_default_space = get_searchspace(model='random_forest', name='myRegr', task='regr')
 rf_uniform_params = dict(
-                            n_estimators=scope.int(hp.qlognormal('myRegr_random_forest_n_estimators', 1, 0.5, 1)),
+                            n_estimators=scope.int(hp.uniform('myRegr_lightgbm_n_estimators', 25, 2000)),
                             max_features=hp.pchoice('myRegr_random_forest_max_features', [
                                                     (0.2, 'sqrt'),  # most common choice.
                                                     (0.1, 'log2'),  # less common choice.
@@ -99,7 +99,7 @@ xgboost_default_space = get_searchspace(model='xgboost', name='myRegr', task='re
 xgboost_uniform_params = dict(
                             max_depth=scope.int(hp.uniform('myRegr_xgboost_max_depth', 1, 11)),
                             learning_rate=hp.uniform('myRegr_xgboost_learning_rate', 0.0001, 0.5),
-                            n_estimators=scope.int(hp.uniform('myRegr_xgboost_n_estimators',25, 2000)),
+                            n_estimators=scope.int(hp.uniform('myRegr_xgboost_n_estimators', 25, 2000)),
                             gamma=hp.uniform('myRegr_xgboost_gamma', 0.0001, 5),
                             min_child_weight=scope.int(hp.uniform('myRegr_xgboost_min_child_weight', 1, 100)),
                             max_delta_step=0,

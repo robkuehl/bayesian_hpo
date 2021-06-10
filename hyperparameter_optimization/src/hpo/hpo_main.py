@@ -1,6 +1,6 @@
 import sys
 sys.path.append('..')
-
+import os
 from src.hpo.hpo_objective import get_optimization_func
 from skopt import gp_minimize
 from hyperopt import hp, fmin, Trials, tpe, space_eval, rand
@@ -73,6 +73,8 @@ def hpo_hyperopt(experiment_id, algo, task, model_type, eval_metric, num_fold_sp
     
 def run_hpo_search(experiments, foldername):
     mlflow.set_tracking_uri(uri='file:/'+str(pathjoin(mlruns_folderpath, foldername, 'mlruns'))) 
+    print('Storing mlflow logs in {}'.format(mlflow.tracking.get_tracking_uri()))
+    print(os.path.isdir(mlflow.tracking.get_tracking_uri()))
     if type(experiments[0])!=dict:
         raise ValueError('Experiments need to be dictionaries!')
     # Create an experiment with a name that is unique and case sensitive.

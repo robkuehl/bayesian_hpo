@@ -4,6 +4,8 @@ from os.path import join as pathjoin
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import pickle
+from shutil import make_archive
+import boto3
 
 raw_data_folderpath = pathjoin(Path(__file__).parent.absolute(), Path('../../data/raw'))
 
@@ -96,6 +98,39 @@ def dfinfo(df, feature_dtype_list=[], jupyter=False, save=False, returndf=False,
     
     
     #=====================================EXPORT=========================================================
-    def export_experiment_data():
-        # TODO: Export Funktion
+    def zip_folder(root_dir:Path, target_folder:Path, archive_name:str):
+        archive_path = pathjoin(target_folder, archive_name)
+        make_archive(archive_path, 'zip', root_dir)
+        if os.path.isfile(archive_path+'.zip'):
+            # successfull compression
+            return archive_path+'.zip'
+        else:
+            # compression failed
+            return 1
+    
+    def upload_to_s3(sourcefile_path:Path, s3_client, s3_bucket, target_path):
         pass
+    
+    def load_aws_credentials(self, config_file=None, key=None, secret=None):
+        """
+        Sets the credentials to AWS either by providing the key and secret directly
+        or by specifying the location/file containing the confiurations
+
+        config_file : str, optional
+            The path to the config file for the AWS credentials, eiher use config_file or key and secret
+            config_file overrides key and secret.
+        key : str, optional
+            The key for the AWS access, either use key and secret or the config_file option
+        secret : str, optional
+            The secret for the AWS access, either use key and secret or the config_file option
+        """
+        if config_file is not None:
+            key, secret = self._load_aws_config(config_file)
+
+        # XOR testing key and secret
+        if bool(key is None) != bool(secret is None):
+            self.logger.log_warning("key and secret have to be both either be set or left empty, aborting upload")
+            return
+
+        self.key = key
+        self.secret = secret

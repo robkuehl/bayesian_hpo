@@ -61,7 +61,6 @@ def _xgboost_max_depth(name):
 def _xgboost_learning_rate(name):
     return hp.loguniform(name, np.log(0.0001), np.log(0.5)) - 0.0001
 
-# TODO: Set Max Estimators to a reasonable size
 def _xgboost_n_estimators(name):
     #return scope.int(hp.quniform(name, 100, 6000, 200))
     return scope.int(hp.lognormal(name,  mu=0, sigma=0.5)*100)
